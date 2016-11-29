@@ -1,0 +1,69 @@
+package com.briup.java_day21.exercise3;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.ServerSocket;
+import java.net.Socket;
+
+public class FileServer {
+	public static void main(String[] args) {
+		ServerSocket server = null;
+		Socket client = null;
+		BufferedReader br = null;
+		PrintWriter pw = null;
+		File f = null;
+		BufferedReader brFile = null;
+		try {
+			server = new ServerSocket(9999);
+			client = server.accept();
+			br = new BufferedReader(new InputStreamReader(client.getInputStream(), "UTF-8"));
+			pw = new PrintWriter(client.getOutputStream(), true);
+			try {
+				Thread.sleep(10);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			pw.write("\r\n");
+			pw.flush();
+			while (!(f = new File(br.readLine())).exists()) {
+				pw.write("NO\r\n");
+				pw.flush();
+			}
+			pw.write("YES\r\n");
+			pw.flush();
+			brFile = new BufferedReader(new FileReader(f));
+			System.out.println(f.length());
+			/*char[] cbuf = new char[(int) f.length()];
+			brFile.read(cbuf, 0, (int) f.length());*/
+			String line = null;
+			while((line = brFile.readLine())!=null){
+				pw.println(line);
+				pw.flush();
+			}
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			try {
+				if (pw != null) {
+					pw.close();
+				}
+				if (br != null) {
+					br.close();
+				}
+				if (client != null) {
+					client.close();
+				}
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+}
